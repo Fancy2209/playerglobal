@@ -1,0 +1,1 @@
+export { ContextGLProfile as Context3DProfile } from '@awayjs/stage';
