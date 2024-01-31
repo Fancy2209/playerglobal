@@ -75,10 +75,6 @@ import { ContextMenuItem } from './ui/ContextMenuItem';
 import { FrameLabel } from './display/FrameLabel';
 import { TextLineMetrics } from './text/TextLineMetrics';
 import { FocusEvent } from './events/FocusEvent';
-import { Context3D } from './display3D/Context3D'
-import { Context3DClearMask } from './display3D/Context3DClearMask'
-import { Context3DProfile } from './display3D/Context3DProfile'
-import { Context3DProgramType } from './display3D/Context3DProgramType'
 
 export class Mouse {}
 
