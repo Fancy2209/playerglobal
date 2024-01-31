@@ -44,10 +44,10 @@ export class Stage3D extends EventDispatcher {
 		this._adaptee.visible = value;
 	}
 
-	private convertStringToContext3DProfile(profileString: string): Context3DProfile | undefined {
+	private convertStringToContext3DProfile(profileString: string): Context3DProfile {
 		const profileUpperCase = profileString.toUpperCase();
 	  
-		const profileEnumValue: Context3DProfile | undefined = Context3DProfile[profileUpperCase as keyof typeof Context3DProfile];
+		const profileEnumValue: Context3DProfile = Context3DProfile[profileUpperCase as keyof typeof Context3DProfile];
 	  
 		return profileEnumValue;
 	  }
