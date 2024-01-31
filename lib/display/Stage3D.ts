@@ -45,10 +45,8 @@ export class Stage3D extends EventDispatcher {
 	}
 
 	private convertStringToContext3DProfile(profileString: string): Context3DProfile | undefined {
-		// Convert the string to uppercase (assuming the enum values are in uppercase)
 		const profileUpperCase = profileString.toUpperCase();
 	  
-		// Use the enum as a lookup mechanism
 		const profileEnumValue: Context3DProfile | undefined = Context3DProfile[profileUpperCase as keyof typeof Context3DProfile];
 	  
 		return profileEnumValue;
