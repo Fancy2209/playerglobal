@@ -462,7 +462,7 @@ export class SimpleButton extends InteractiveObject {
 
 	public set soundTransform(value: SoundTransform) {
 
-		(<AwayMovieClip> this.adaptee).soundVolume = value? value.volume : 1;
+		(<AwayMovieClip> this.adaptee).soundVolume = value ? value.volume : 1;
 
 		this._soundTransform = value;
 	}

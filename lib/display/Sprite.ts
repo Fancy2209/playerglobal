@@ -573,7 +573,7 @@ export class Sprite extends DisplayObjectContainer {
 
 	public set soundTransform(value: SoundTransform) {
 
-		(<AwayMovieClip> this.adaptee).soundVolume = value? value.volume : 1;
+		(<AwayMovieClip> this.adaptee).soundVolume = value ? value.volume : 1;
 
 		this._soundTransform = value;
 	}
