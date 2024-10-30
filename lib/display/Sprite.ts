@@ -12,6 +12,7 @@ import { constructClassFromSymbol } from '@awayfl/avm2';
 import { SecurityDomain } from '../SecurityDomain';
 import { release, AVMStage } from '@awayfl/swf-loader';
 import { EntityNode, PickEntity } from '@awayjs/view';
+import { SoundTransform } from '../media/SoundTransform';
 
 export class Sprite extends DisplayObjectContainer {
 
@@ -30,6 +31,7 @@ export class Sprite extends DisplayObjectContainer {
 	public initAdapter(): void {}
 
 	private _graphics: Graphics;
+	private _soundTransform: SoundTransform;
 
 	protected _registeredChildNames: Array<string>;
 
@@ -557,15 +559,23 @@ export class Sprite extends DisplayObjectContainer {
 	 *
 	 *   Note: This property does not affect HTML content in an HTMLControl object (in Adobe AIR).
 	 */
-	public get soundTransform(): any {
-		// @todo
-		Debug.throwPIR('playerglobals/display/Sprite', 'get soundTransform', '');
-		return null;
+	public get soundTransform(): SoundTransform {
+		//	we not create this in the constructor, because it gets overwritten from Sound in most cases anyway
+		//	but we still need a Soundtransform to be available in the getter
+		if (!this._soundTransform) {
+			this._soundTransform = new (<any> this.sec).flash.media.SoundTransform();
+		}
+
+		this._soundTransform.volume = (<AwayMovieClip> this.adaptee).soundVolume;
+
+		return this._soundTransform;
 	}
 
-	public set soundTransform(sndTransform: any) {
-		// @todo
-		Debug.throwPIR('playerglobals/display/Sprite', 'set soundTransform', '');
+	public set soundTransform(value: SoundTransform) {
+
+		(<AwayMovieClip> this.adaptee).soundVolume = value? value.volume : 1;
+
+		this._soundTransform = value;
 	}
 
 	/**
