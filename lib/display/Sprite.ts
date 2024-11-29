@@ -382,8 +382,6 @@ export class Sprite extends DisplayObjectContainer {
 			return;
 		}
 
-		this[child.name] = child._adapter ? child.adapter : child;
-
 		this.axSetPublicProperty(child.name, child.adapter);
 
 		if (!this._registeredChildNames) {
