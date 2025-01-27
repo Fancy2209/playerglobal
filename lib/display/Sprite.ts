@@ -187,10 +187,6 @@ export class Sprite extends DisplayObjectContainer {
 		let i: number;
 		let k: number;
 
-		if (this['$Bg__setPropDict']) {
-			this.clearPropsDic();
-		}
-
 		// step1: apply remove / add commands to virtual scenegraph. collect update commands aswell
 
 		timeline._update_indices.length = 0;
@@ -405,10 +401,6 @@ export class Sprite extends DisplayObjectContainer {
 			(<AwayMovieClip>child).removeButtonListeners();
 	}
 
-	public clearPropsDic() {
-		//this["$Bg__setPropDict"].map = new WeakMap();
-	}
-
 	public clone(): Sprite {
 
 		if (!(<any> this)._symbol) {
@@ -426,9 +418,6 @@ export class Sprite extends DisplayObjectContainer {
 		(<any>clone).executeConstructor = () => {
 			(<any>clone).axInitializer();
 			(<any> this).constructorHasRun = true;
-			/*if(clone["$Bg__setPropDict"]){
-				console.log("Bg__setPropDict found");
-			}*/
 		};
 		clone.adaptee.graphics = this.graphics;
 

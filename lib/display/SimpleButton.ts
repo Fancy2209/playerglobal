@@ -178,10 +178,6 @@ export class SimpleButton extends InteractiveObject {
 		let i: number;
 		let k: number;
 
-		if (this['$Bg__setPropDict']) {
-			this.clearPropsDic();
-		}
-
 		// step1: apply remove / add commands to virtual scenegraph. collect update commands aswell
 
 		timeline._update_indices.length = 0;
@@ -358,10 +354,6 @@ export class SimpleButton extends InteractiveObject {
 	}
 
 	public unregisterScriptObject(child: any): void {
-	}
-
-	public clearPropsDic() {
-		//this["$Bg__setPropDict"].map = new WeakMap();
 	}
 
 	/**
