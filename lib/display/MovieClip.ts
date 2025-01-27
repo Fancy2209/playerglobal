@@ -1,7 +1,7 @@
 import { MovieClip as AwayMovieClip,
 	DisplayObject as AwayDisplayObject,
-	IMovieClipAdapter,  FrameScriptManager, Timeline, 
-	IFrameScript} from '@awayjs/scene';
+	IMovieClipAdapter,  FrameScriptManager, Timeline,
+	IFrameScript } from '@awayjs/scene';
 import { Sprite } from './Sprite';
 import { AssetBase, Debug } from '@awayjs/core';
 import { constructClassFromSymbol } from '@awayfl/avm2';
@@ -52,7 +52,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	private static _movieClips: Array<MovieClip> = new Array<MovieClip>();
 	private static current_script_scope: MovieClip=null;
 
-	private _framescripts:IFrameScript[] = [];
+	private _framescripts: IFrameScript[] = [];
 
 	// 	executed directly after a MC has been constructed via Object.create,
 	//	befre the actual constructors have been run
@@ -84,7 +84,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		this.allowScript = false;
 		const prev_script_scope = MovieClip.current_script_scope;
 		MovieClip.current_script_scope = this;
-		
+
 		script.axCall(this);
 
 		MovieClip.current_script_scope = prev_script_scope;
