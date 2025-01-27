@@ -167,7 +167,7 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner {
 		if (this._bitmapData)
 			this._bitmapData._addOwner(this);
 
-		const material: MethodMaterial = <MethodMaterial> (<Billboard> this._adaptee).material;
+		const material: MethodMaterial = <MethodMaterial> (<Billboard> this.adaptee).material;
 		if (this._bitmapData) {
 			if (!material.ambientMethod.texture)
 				material.ambientMethod.texture = new ImageTexture2D();
