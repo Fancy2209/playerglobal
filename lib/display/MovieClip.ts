@@ -1,6 +1,7 @@
 import { MovieClip as AwayMovieClip,
 	DisplayObject as AwayDisplayObject,
-	IMovieClipAdapter,  FrameScriptManager, Timeline } from '@awayjs/scene';
+	IMovieClipAdapter,  FrameScriptManager, Timeline, 
+	IFrameScript} from '@awayjs/scene';
 import { Sprite } from './Sprite';
 import { AssetBase, Debug } from '@awayjs/core';
 import { constructClassFromSymbol } from '@awayfl/avm2';
@@ -8,9 +9,6 @@ import { Event } from '../events/Event';
 import { FrameLabel } from './FrameLabel';
 import { SecurityDomain } from '../SecurityDomain';
 
-const includeString: string = '';//TODO
-
-declare let __framescript__;
 /**
  * The MovieClip class inherits from the following classes: Sprite, DisplayObjectContainer,
  * InteractiveObject, DisplayObject, and EventDispatcher.
@@ -54,6 +52,8 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	private static _movieClips: Array<MovieClip> = new Array<MovieClip>();
 	private static current_script_scope: MovieClip=null;
 
+	private _framescripts:IFrameScript[] = [];
+
 	// 	executed directly after a MC has been constructed via Object.create,
 	//	befre the actual constructors have been run
 	public applySymbol() {}
@@ -68,21 +68,6 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		return new MovieClip();
 	}
 
-	//forAVM1:
-	public _getAbsFrameNumber(param1: any, param2: any): number {
-		return 0;
-	}
-
-	public callFrame(param1: any) {
-	}
-
-	public _callFrame(param1: any) {
-	}
-
-	public addScript(param1: any) {
-		return param1;
-	}
-
 	// call this after you call scripts
 	public queuedNavigationAction: Function=null;
 	public allowScript: boolean;
@@ -91,19 +76,17 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		if (!this.allowScript && (<any> this.sec).swfVersion > 9) {
 			return;
 		}
-		scripts = (<AwayMovieClip> this.adaptee).timeline.get_script_for_frame(
-			<AwayMovieClip> this.adaptee, (<AwayMovieClip> this.adaptee).currentFrameIndex, false);
-		if (!scripts) {
+		const script: any = this._framescripts[(<AwayMovieClip> this.adaptee).currentFrameIndex];
+		if (!script) {
 			return;
 		}
 
 		this.allowScript = false;
 		const prev_script_scope = MovieClip.current_script_scope;
 		MovieClip.current_script_scope = this;
-		for (let k = 0; k < scripts.length; k++) {
-			scripts[k].setReceiver(this);
-			scripts[k].axCall(this);
-		}
+		
+		script.axCall(this);
+
 		MovieClip.current_script_scope = prev_script_scope;
 
 		if (this.queuedNavigationAction) {
@@ -130,27 +113,6 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		//console.log("createAdaptee AwayMovieClip");
 		//FrameScriptManager.execute_queue();
 		return adaptee;
-	}
-	// --------------------- stuff needed because of implementing the existing IMovieClipAdapter
-
-	public clearPropsDic() {
-		//	this is used by CompiledClips
-		//	todo: check if "$Bg__setPropDict" can be used to identify compiledClips
-		//this["$Bg__setPropDict"].map= new WeakMap();
-	}
-
-	public evalScript(str: string): Function {
-		const tag: HTMLScriptElement = document.createElement('script');
-		tag.text = 'var __framescript__ = function() {\n' + includeString + str + '\n}';
-
-		//add and remove script tag to dom to trigger compilation
-		const sibling = document.scripts[0];
-		sibling.parentNode.insertBefore(tag, sibling).parentNode.removeChild(tag);
-
-		const script = __framescript__;
-		window['__framescript__'] = null;
-
-		return script;
 	}
 
 	public freeFromScript(): void {
@@ -354,7 +316,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 		for (let i = 0; i < numArgs; i += 2) {
 			const frameNum = (args[i] | 0);
 			const fn = args[i + 1];
-			(<AwayMovieClip> this.adaptee).timeline.add_framescript(fn, frameNum, <any> this.adaptee);
+			this._framescripts[frameNum] = fn;
 
 			// newly registered scripts get queued in FrameScriptManager.execute-as3constructor
 			//console.log("add framescript", frameNum, this.adaptee, this.adaptee.parent);
