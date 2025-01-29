@@ -388,8 +388,7 @@ export class Sprite extends DisplayObjectContainer {
 	}
 
 	public unregisterScriptObject(child: AwayDisplayObject): void {
-		if (this[child.name] == child.adapter) {
-			delete this[child.name];
+		if (this.axGetPublicProperty(child.name) == child.adapter) {
 			this.axDeletePublicProperty(child.name);
 
 			if (this._registeredChildNames) {
