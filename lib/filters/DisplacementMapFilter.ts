@@ -177,8 +177,8 @@ export class DisplacementMapFilter extends BitmapFilter implements IDisplacement
 	toAwayObject(): InterfaceOf<IDisplacementFilter> {
 		return {
 			filterName: 'displacement',
-			mapBitmap: this._mapBitmap.adaptee,
-			mapPoint: this._mapPoint.adaptee,
+			mapBitmap: this._mapBitmap?.adaptee,
+			mapPoint: this._mapPoint?.adaptee,
 			componentX: this._componentX,
 			componentY: this._componentY,
 			scaleX: this._scaleX,
