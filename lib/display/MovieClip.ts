@@ -52,7 +52,7 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	private static _movieClips: Array<MovieClip> = new Array<MovieClip>();
 	private static current_script_scope: MovieClip=null;
 
-	private _framescripts: IFrameScript[] = [];
+	private _framescripts: IFrameScript[];
 
 	// 	executed directly after a MC has been constructed via Object.create,
 	//	befre the actual constructors have been run
@@ -69,11 +69,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 	}
 
 	// call this after you call scripts
-	public queuedNavigationAction: Function=null;
+	public queuedNavigationAction: Function;
 	public allowScript: boolean;
 
 	public executeScript(scripts: any) {
-		if (!this.allowScript && (<any> this.sec).swfVersion > 9) {
+		if (!this._framescripts || !this.allowScript && (<any> this.sec).swfVersion > 9) {
 			return;
 		}
 		const script: any = this._framescripts[(<AwayMovieClip> this.adaptee).currentFrameIndex];
@@ -313,6 +313,11 @@ export class MovieClip extends Sprite implements IMovieClipAdapter {
 			this.sec.throwError('ArgumentError TooFewArgumentsError', numArgs,
 				numArgs + 1);
 		}
+
+		//addFrameScript can be called before constructor
+		if (!this._framescripts)
+			this._framescripts = [];
+
 		for (let i = 0; i < numArgs; i += 2) {
 			const frameNum = (args[i] | 0);
 			const fn = args[i + 1];
