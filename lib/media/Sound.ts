@@ -309,7 +309,7 @@ export class Sound extends EventDispatcher {
 	public get length (): number {
 		if (!this._adaptee)
 			return;
-		return this._adaptee.duration;
+		return this._adaptee.duration * 1000;
 	}
 
 	/**

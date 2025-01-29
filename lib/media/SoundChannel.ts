@@ -80,8 +80,7 @@ export class SoundChannel extends EventDispatcher implements ISoundSource {
 	 * If the sound is looped, position is reset to 0 at the beginning of each loop.
 	 */
 	public get position(): number {
-		release || console.log('position not implemented yet in flash/SoundChannel');
-		return 0;
+		return this._channel.currentTime;
 	}
 
 	/**

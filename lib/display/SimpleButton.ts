@@ -1,8 +1,7 @@
 import { DisplayObject } from './DisplayObject';
 import { SoundTransform } from '../media/SoundTransform';
-import { MovieClip } from './MovieClip';
 import { Timeline, DisplayObjectContainer as AwayDisplayObjectContainer,
-	DisplayObject as AwayDisplayObject, IDisplayObjectAdapter, FrameScriptManager, IMovieClipAdapter } from '@awayjs/scene';
+	DisplayObject as AwayDisplayObject, IDisplayObjectAdapter, FrameScriptManager } from '@awayjs/scene';
 import { MovieClip as AwayMovieClip } from '@awayjs/scene';
 import { IVirtualSceneGraphItem } from './IVirtualSceneGraphItem';
 import { AssetBase, Debug } from '@awayjs/core';
@@ -61,6 +60,9 @@ import { constructClassFromSymbol } from '@awayfl/avm2';
 
  */
 export class SimpleButton extends InteractiveObject {
+
+	private _soundTransform: SoundTransform;
+
 	/**
 	 * Creates a new SimpleButton instance. Any or all of the display objects that represent
 	 * the various button states can be set as parameters in the constructor.
@@ -175,10 +177,6 @@ export class SimpleButton extends InteractiveObject {
 
 		let i: number;
 		let k: number;
-
-		if (this['$Bg__setPropDict']) {
-			this.clearPropsDic();
-		}
 
 		// step1: apply remove / add commands to virtual scenegraph. collect update commands aswell
 
@@ -358,10 +356,6 @@ export class SimpleButton extends InteractiveObject {
 	public unregisterScriptObject(child: any): void {
 	}
 
-	public clearPropsDic() {
-		//this["$Bg__setPropDict"].map = new WeakMap();
-	}
-
 	/**
 	 * Specifies a display object that is used as the visual
 	 * object for the button "Down" state —the state that the button is in when the user
@@ -446,15 +440,23 @@ export class SimpleButton extends InteractiveObject {
 	 *   how much of the left input to play in the left speaker or right speaker; it is generally
 	 *   best to use 22-KHZ 6-bit mono sounds?
 	 */
-	public get soundTransform (): SoundTransform {
-		// @todo
-		Debug.throwPIR('playerglobals/display/SimpleButton', 'get soundTransform', '');
-		return null;
+	public get soundTransform(): SoundTransform {
+		//	we not create this in the constructor, because it gets overwritten from Sound in most cases anyway
+		//	but we still need a Soundtransform to be available in the getter
+		if (!this._soundTransform) {
+			this._soundTransform = new (<any> this.sec).flash.media.SoundTransform();
+		}
+
+		this._soundTransform.volume = (<AwayMovieClip> this.adaptee).soundVolume;
+
+		return this._soundTransform;
 	}
 
-	public set soundTransform (sndTransform: SoundTransform) {
-		// @todo
-		Debug.throwPIR('playerglobals/display/SimpleButton', 'set soundTransform', '');
+	public set soundTransform(value: SoundTransform) {
+
+		(<AwayMovieClip> this.adaptee).soundVolume = value ? value.volume : 1;
+
+		this._soundTransform = value;
 	}
 
 	/**

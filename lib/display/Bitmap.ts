@@ -52,9 +52,6 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner {
 	private _bitmapMappedFromAsset: boolean;
 
 	private static _bitmaps: Array<Bitmap> = new Array<Bitmap>();
-	private static argBitmapMaterial: MethodMaterial;
-	private static argPixelSnapping: string;
-	private static argSmoothing: boolean;
 
 	public static getNewBitmap(
 		bitmapData: BitmapData = null,
@@ -83,22 +80,13 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner {
 	 *   smoothing set to false (left) and true (right):
 	 */
 	constructor(bitmapData: BitmapData = null, pixelSnapping: string = 'auto', smoothing: boolean = false) {
-		const newMaterial: MethodMaterial = bitmapData ?
-			new MethodMaterial(bitmapData.adaptee) : new MethodMaterial(0x0);
-		newMaterial.alphaBlending = true;
-		newMaterial.useColorTransform = true;
-
-		Bitmap.argBitmapMaterial = newMaterial;
-		Bitmap.argPixelSnapping = pixelSnapping;
-		Bitmap.argSmoothing = smoothing;
 		super();
 
-		if (bitmapData && !this._bitmapMappedFromAsset) {
-			this._bitmapData = bitmapData;
+		if (!this._bitmapData && bitmapData)
+			this.bitmapData = bitmapData;
 
-			if (this._bitmapData)
-				this._bitmapData._addOwner(this);
-		}
+		this.pixelSnapping = pixelSnapping;
+		this.smoothing = smoothing;
 	}
 
 	protected mapAdaptee(adaptee: AwayDisplayObject) {
@@ -117,11 +105,12 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner {
 	}
 
 	protected createAdaptee(): AwayDisplayObject {
-		const newAdaptee =
-			Billboard.getNewBillboard(Bitmap.argBitmapMaterial, Bitmap.argPixelSnapping, Bitmap.argSmoothing);
-		Bitmap.argBitmapMaterial = null;
-		Bitmap.argPixelSnapping = null;
-		Bitmap.argSmoothing = null;
+		const newMaterial: MethodMaterial = new MethodMaterial(0x0);
+		newMaterial.alphaBlending = true;
+		newMaterial.useColorTransform = true;
+
+		const newAdaptee = Billboard.getNewBillboard(newMaterial);
+
 		return newAdaptee;
 	}
 
@@ -167,7 +156,7 @@ export class Bitmap extends DisplayObject implements IBitmapDataOwner {
 		if (this._bitmapData)
 			this._bitmapData._addOwner(this);
 
-		const material: MethodMaterial = <MethodMaterial> (<Billboard> this._adaptee).material;
+		const material: MethodMaterial = <MethodMaterial> (<Billboard> this.adaptee).material;
 		if (this._bitmapData) {
 			if (!material.ambientMethod.texture)
 				material.ambientMethod.texture = new ImageTexture2D();

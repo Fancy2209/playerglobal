@@ -12,6 +12,7 @@ import { constructClassFromSymbol } from '@awayfl/avm2';
 import { SecurityDomain } from '../SecurityDomain';
 import { release, AVMStage } from '@awayfl/swf-loader';
 import { EntityNode, PickEntity } from '@awayjs/view';
+import { SoundTransform } from '../media/SoundTransform';
 
 export class Sprite extends DisplayObjectContainer {
 
@@ -30,6 +31,7 @@ export class Sprite extends DisplayObjectContainer {
 	public initAdapter(): void {}
 
 	private _graphics: Graphics;
+	private _soundTransform: SoundTransform;
 
 	protected _registeredChildNames: Array<string>;
 
@@ -184,10 +186,6 @@ export class Sprite extends DisplayObjectContainer {
 
 		let i: number;
 		let k: number;
-
-		if (this['$Bg__setPropDict']) {
-			this.clearPropsDic();
-		}
 
 		// step1: apply remove / add commands to virtual scenegraph. collect update commands aswell
 
@@ -380,8 +378,6 @@ export class Sprite extends DisplayObjectContainer {
 			return;
 		}
 
-		this[child.name] = child._adapter ? child.adapter : child;
-
 		this.axSetPublicProperty(child.name, child.adapter);
 
 		if (!this._registeredChildNames) {
@@ -405,10 +401,6 @@ export class Sprite extends DisplayObjectContainer {
 			(<AwayMovieClip>child).removeButtonListeners();
 	}
 
-	public clearPropsDic() {
-		//this["$Bg__setPropDict"].map = new WeakMap();
-	}
-
 	public clone(): Sprite {
 
 		if (!(<any> this)._symbol) {
@@ -426,9 +418,6 @@ export class Sprite extends DisplayObjectContainer {
 		(<any>clone).executeConstructor = () => {
 			(<any>clone).axInitializer();
 			(<any> this).constructorHasRun = true;
-			/*if(clone["$Bg__setPropDict"]){
-				console.log("Bg__setPropDict found");
-			}*/
 		};
 		clone.adaptee.graphics = this.graphics;
 
@@ -557,15 +546,23 @@ export class Sprite extends DisplayObjectContainer {
 	 *
 	 *   Note: This property does not affect HTML content in an HTMLControl object (in Adobe AIR).
 	 */
-	public get soundTransform(): any {
-		// @todo
-		Debug.throwPIR('playerglobals/display/Sprite', 'get soundTransform', '');
-		return null;
+	public get soundTransform(): SoundTransform {
+		//	we not create this in the constructor, because it gets overwritten from Sound in most cases anyway
+		//	but we still need a Soundtransform to be available in the getter
+		if (!this._soundTransform) {
+			this._soundTransform = new (<any> this.sec).flash.media.SoundTransform();
+		}
+
+		this._soundTransform.volume = (<AwayMovieClip> this.adaptee).soundVolume;
+
+		return this._soundTransform;
 	}
 
-	public set soundTransform(sndTransform: any) {
-		// @todo
-		Debug.throwPIR('playerglobals/display/Sprite', 'set soundTransform', '');
+	public set soundTransform(value: SoundTransform) {
+
+		(<AwayMovieClip> this.adaptee).soundVolume = value ? value.volume : 1;
+
+		this._soundTransform = value;
 	}
 
 	/**
@@ -625,8 +622,7 @@ export class Sprite extends DisplayObjectContainer {
 				this.checkBounds();
 			this.startDragMCPosition.x = this.adaptee.x;
 			this.startDragMCPosition.y = this.adaptee.y;
-			//window.addEventListener("mouseup", this.stopDragDelegate);
-			//window.addEventListener("touchend", this.stopDragDelegate);
+
 			const avmStage = AVMStage.instance();
 			const dragNode = avmStage.view.getNode(this.adaptee);
 			avmStage.mousePicker.dragNode = dragNode;
@@ -642,7 +638,7 @@ export class Sprite extends DisplayObjectContainer {
 			collision.rootNode = dragNode;
 
 			avmStage.mouseManager.startDragObject(collision);
-			avmStage.view.stage.addEventListener(MouseEvent.MOUSE_MOVE, this.dragListenerDelegate);
+			avmStage.root.addEventListener(MouseEvent.MOUSE_MOVE, this.dragListenerDelegate);
 		}
 	}
 
@@ -723,9 +719,7 @@ export class Sprite extends DisplayObjectContainer {
 		const avmStage = AVMStage.instance();
 		avmStage.mousePicker.dragNode = null;
 		avmStage.mouseManager.stopDragObject();
-		avmStage.view.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.dragListenerDelegate);
-		//window.removeEventListener("mouseup", this.stopDragDelegate);
-		//window.removeEventListener("touchend", this.stopDragDelegate);
+		avmStage.root.removeEventListener(MouseEvent.MOUSE_MOVE, this.dragListenerDelegate);
 	}
 
 	/**
