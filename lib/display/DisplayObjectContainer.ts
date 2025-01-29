@@ -279,7 +279,7 @@ export class DisplayObjectContainer extends InteractiveObject {
 		const registerChild: boolean = (child.adaptee._sessionID >= 0 && (<any> this).registerScriptObject);
 		const dispatchAdded = !(child.adaptee.parent == this.adaptee);
 
-		(<AwayDisplayObjectContainer> this._adaptee).addChild((<DisplayObject>child).adaptee);
+		(<AwayDisplayObjectContainer> this.adaptee).addChild(child.adaptee);
 
 		if (registerChild) {
 			(<any> this).registerScriptObject(child.adaptee);

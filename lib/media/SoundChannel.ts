@@ -80,7 +80,7 @@ export class SoundChannel extends EventDispatcher implements ISoundSource {
 	 * If the sound is looped, position is reset to 0 at the beginning of each loop.
 	 */
 	public get position(): number {
-		return this._channel.currentTime;
+		return this._channel ? this._channel.currentTime : 0;
 	}
 
 	/**
